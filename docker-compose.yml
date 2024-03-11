@@ -1,0 +1,52 @@
+version: '3.8'
+services:
+  eureka-server:
+    build: ./EurekaServer
+    ports:
+      - "8761:8761"
+
+  company-service:
+    build: ./company_ms
+    ports:
+      - "8060:8060"
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - postgres
+
+  job-service:
+    build: ./job_ms
+    ports:
+      - "8070:8070"
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - postgres
+
+  review-service:
+    build: ./review_ms
+    ports:
+      - "8050:8050"
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - postgres
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pranjal
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
